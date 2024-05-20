@@ -1,0 +1,43 @@
+import smtplib
+import random
+import getpass
+
+def generate_otp():
+    return str(random.randint(100000, 999999))
+
+def send_otp_via_email(sender_email, sender_password, recipient_email, otp):
+    smtp_server = "smtp.gmail.com"
+    smtp_port = 587
+    subject = "Your OTP"
+    message = f"Your One-Time Password (OTP) is: {otp}"
+    email_message = f"Subject: {subject}\n\n{message}"
+
+    try:
+        server = smtplib.SMTP(smtp_server, smtp_port)
+        server.starttls()
+        server.login(sender_email, sender_password)
+        server.sendmail(sender_email, recipient_email, email_message)
+        server.quit()
+        print(f"OTP sent to {recipient_email}. Check your email!")
+        return True
+    except smtplib.SMTPException as e:
+        print(f"Error sending email: {e}")
+        return False
+
+def main():
+    otp = generate_otp()
+    user_email = input("Enter your email address: ")
+    sender_email = "chaudharynayan2005@gmail.com"  # Replace with your actual email
+    sender_password = getpass.getpass("Enter your email password (or app-specific password if 2FA is enabled): ")
+
+    if send_otp_via_email(sender_email, sender_password, user_email, otp):
+        user_input_otp = input("Enter the OTP received in your email: ")
+        if user_input_otp == otp:
+            print("OTP verification successful!")
+        else:
+            print("Invalid OTP. Please try again.")
+    else:
+        print("Failed to send the OTP email. Please check your email credentials and try again.")
+
+if __name__ == "__main__":
+    main()
